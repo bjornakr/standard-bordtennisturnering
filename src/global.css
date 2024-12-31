@@ -1,0 +1,13 @@
+html {
+    font-family: "Noto", sans-serif;
+    background-color: #f9f9f9;
+    color: #222;
+}
+
+button {
+    font-family: inherit;
+}
+
+input {
+    font-family: inherit;
+}
