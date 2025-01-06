@@ -1,5 +1,6 @@
 # Standard bordtennisturnering
 
+* https://www.dicebear.com/how-to-use/js-library/
 
 
 # sv

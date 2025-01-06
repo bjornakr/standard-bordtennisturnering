@@ -17,17 +17,21 @@
             <th>Hjemme</th>
             <th>Borte</th>
             <th>Poengstilling</th>
-            <th>Handlinger</th>
+            <th></th>
         </tr>
     </thead>
     <tbody>
         {#each matches as match, index}
             <tr>
-                <td>{index + 1}</td> <!-- Match number -->
-                <td>{match[0]}</td> <!-- Home player -->
-                <td>{match[1]}</td> <!-- Away player -->
-                <td>-</td> <!-- Placeholder for points -->
-                <td><button>Spill kamp</button> <button>Sett resultat</button></td>
+                <td>{index + 1}</td>
+                <td>{match[0]}</td>
+                <td>{match[1]}</td>
+                <td>-</td>
+                <td>
+                    <button>📝</button> 
+                    <!-- <button>Sett resultat</button>
+                    <button>Slett resultat</button> -->
+                </td>
             </tr>
         {/each}
     </tbody>
