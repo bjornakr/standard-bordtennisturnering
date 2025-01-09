@@ -36,7 +36,7 @@
 	function createTournament() {
 		savePlayers(players); // Save players to localStorage
 		deleteAllMatches();
-		goto('/tournament'); // Navigate to tournament index page
+		goto(`tournament`); // Navigate to tournament index page
 	}
 </script>
 

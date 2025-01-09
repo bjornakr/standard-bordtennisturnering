@@ -33,7 +33,7 @@
 <div class="actions">
     <button>Spill kamp</button>
     <button>Sett resultat</button>
-    <button onclick={() => goto("/tournament")}>Gå tilbake til turneringsoversikt</button>
+    <button onclick={() => goto("tournament")}>Gå tilbake til turneringsoversikt</button>
 </div>
 
 <style>

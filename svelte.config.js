@@ -19,7 +19,10 @@ const config = {
 			fallback: undefined,
 			precompress: false,
 			strict: false
-		})
+		}),
+		paths: {
+			base: '/standard-bordtennisturnering', // Base path for GitHub Pages
+		},
 	}
 };
 

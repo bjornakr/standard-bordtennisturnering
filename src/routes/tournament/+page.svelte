@@ -42,7 +42,7 @@
             <td>{match.away.name}</td>
             <td>-</td>
             <td>
-                <button onclick={() => goto(`/match/${match.matchNo}`)}>📝</button>
+                <button onclick={() => goto(`match/${match.matchNo}`)}>📝</button>
             </td>
         </tr>
     {/each}
