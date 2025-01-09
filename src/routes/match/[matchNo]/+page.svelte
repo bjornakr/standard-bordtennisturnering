@@ -1,40 +1,54 @@
-<script>
-    import {page} from '$app/state';
-    import {loadMatch} from "$lib/localStorageRepo";
-    import {goto} from "$app/navigation";
+<script lang="ts">
+	import { page } from '$app/state';
+	import type { Match } from '$lib/domain';
+	import { loadMatch } from '$lib/localStorageRepo';
+	import { goto } from '$app/navigation';
+	import { onMount } from 'svelte';
 
-    const matchNo = Number(page.params.matchNo); // Get match number from the URL
-    const match = loadMatch(matchNo);
-    if (!match) {
-        throw new Error(`Match not found for matchNo: ${matchNo}`);
-    }
+	let match: Match | null = null;
+	let homeScore = 0;
+	let awayScore = 0;
 
-    let homeScore = 0;
-    let awayScore = 0;
+	onMount(() => {
+		const matchNo = Number(page.params.matchNo); // Get match number from the URL
+		const match_ = loadMatch(matchNo);
+		if (!match_) {
+			throw new Error(`Match not found for matchNo: ${matchNo}`);
+		}
+		else {
+			match = match_;
+		}
+	});
+
 </script>
 
-<h1>Kamp {matchNo}</h1>
+{#if match}
 
-<div class="match-container">
-    <div class="player home">
-        <div class="name">{match.home.name}</div>
-        <div class="avatar">{@html match.home.avatar}</div>
+	<h1>Kamp {match.matchNo}</h1>
 
-        <input type="number" bind:value={homeScore} min="0"/>
-    </div>
-    <div class="vs">vs</div>
-    <div class="player away">
-        <div class="name">{match.away.name}</div>
-        <div class="avatar">{@html match.away.avatar}</div>
-        <input type="number" bind:value={awayScore} min="0"/>
-    </div>
-</div>
+	<div class="match-container">
+		<div class="player home">
+			<div class="name">{match.home.name}</div>
+			<div class="avatar">{@html match.home.avatar}</div>
 
-<div class="actions">
-    <button>Spill kamp</button>
-    <button>Sett resultat</button>
-    <button onclick={() => goto("/tournament")}>Gå tilbake til turneringsoversikt</button>
-</div>
+			<input type="number" bind:value={homeScore} min="0" />
+		</div>
+		<div class="vs">vs</div>
+		<div class="player away">
+			<div class="name">{match.away.name}</div>
+			<div class="avatar">{@html match.away.avatar}</div>
+			<input type="number" bind:value={awayScore} min="0" />
+		</div>
+	</div>
+
+	<div class="actions">
+		<button>Spill kamp</button>
+		<button>Sett resultat</button>
+		<button onclick={() => goto("/tournament")}>Gå tilbake til turneringsoversikt</button>
+	</div>
+{:else}
+	<p>Loading match...</p>
+{/if}
 
 <style>
     h1 {
