@@ -1,8 +1,10 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-    import { goto } from '$app/navigation';
-    import { savePlayers } from '$lib/localStorageRepo';
-	    import type { Player } from '$lib/domain'
+	import { goto } from '$app/navigation';
+	import { createAvatar } from '@dicebear/core';
+	import { avataaars } from '@dicebear/collection';
+	import {deleteAllMatches, savePlayers} from '$lib/localStorageRepo';
+	import type { Player } from '$lib/domain';
 
 	let inputField: HTMLInputElement;
 	onMount(() => inputField.focus());
@@ -11,7 +13,7 @@
 	let newPlayerName = $state('');
 
 	function newPlayerIsValid(): boolean {
-		return newPlayerName.length > 0 && !players.map(ps => ps.name).includes(newPlayerName);
+		return newPlayerName.length > 0 && !players.map((ps) => ps.name).includes(newPlayerName);
 	}
 
 	function canCreateTournament(): boolean {
@@ -20,8 +22,10 @@
 
 	async function addPlayer(event: Event) {
 		event.preventDefault();
-		const avatar = ":-)";
-		players.push({ name: newPlayerName, avatar: avatar });
+		const avatar = createAvatar(avataaars, {
+			seed: newPlayerName
+		});
+		players.push({ name: newPlayerName, avatar: avatar.toString() });
 		newPlayerName = '';
 	}
 
@@ -29,11 +33,11 @@
 		players.splice(idx, 1);
 	}
 
-    function createTournament() {
-        savePlayers(players); // Save players to localStorage
-        goto('/tournament'); // Navigate to tournament index page
-    }
-
+	function createTournament() {
+		savePlayers(players); // Save players to localStorage
+		deleteAllMatches();
+		goto('/tournament'); // Navigate to tournament index page
+	}
 </script>
 
 <h1>Registrer spillere</h1>
@@ -48,11 +52,31 @@
 <ul>
 	{#each players as p, idx}
 		<li>
-			{p}
-			<button aria-label="Delete {p}" onclick={() => deletePlayer(idx)}>❌</button>
+			<span class="avatar">{@html p.avatar}</span>
+			{p.name}
+			<button aria-label="Delete {p.name}" onclick={() => deletePlayer(idx)}>❌</button>
 		</li>
-		<li>{p.avatar}</li>
 	{/each}
 </ul>
 
-<button disabled={!canCreateTournament()} onclick={() => createTournament()}>Opprett turnering</button>
+<button disabled={!canCreateTournament()} onclick={() => createTournament()}
+	>Opprett turnering</button
+>
+
+<style>
+	ul {
+		list-style: none;
+		padding: 0;
+	}
+	li {
+        display: flex;
+        align-items: center;
+		gap: 8px;
+	}
+
+	.avatar {
+        width: 40px;
+        height: 40px;
+        display: inline-block;
+    }
+</style>

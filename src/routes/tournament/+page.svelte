@@ -1,38 +1,50 @@
 <script lang="ts">
-	import { loadPlayers } from '$lib/localStorageRepo';
-	import { roundrobinx } from '$lib/roundrobin';
-	import type { Player } from '$lib/domain';
+    import {loadMatches, loadPlayers, saveMatches} from '$lib/localStorageRepo';
+    import {createMatches} from '$lib/utils';
+    import type {Player} from '$lib/domain';
+    import {goto} from "$app/navigation";
 
-	const players: Player[] = loadPlayers();
-	const matches = roundrobinx([...players]);
-	console.log(matches);
+    const players: Player[] = loadPlayers();
+
+    function getOrCreateMatches() {
+        const storedMatches = loadMatches();
+        if (storedMatches.length > 0)
+            return storedMatches;
+        else {
+            const newMatches = createMatches(players)
+            saveMatches(newMatches);
+            return newMatches;
+        }
+    }
+
+    const matches = getOrCreateMatches();
+    console.log(matches);
+    // const matches = roundrobinx([...players]);
 </script>
 
 <h1>Turnering</h1>
 
 <table>
     <thead>
-        <tr>
-            <th>#</th>
-            <th>Hjemme</th>
-            <th>Borte</th>
-            <th>Poengstilling</th>
-            <th></th>
-        </tr>
+    <tr>
+        <th>#</th>
+        <th>Hjemme</th>
+        <th>Borte</th>
+        <th>Resultat</th>
+        <th></th>
+    </tr>
     </thead>
     <tbody>
-        {#each matches as match, index}
-            <tr>
-                <td>{index + 1}</td>
-                <td>{match[0]}</td>
-                <td>{match[1]}</td>
-                <td>-</td>
-                <td>
-                    <button>📝</button> 
-                    <!-- <button>Sett resultat</button>
-                    <button>Slett resultat</button> -->
-                </td>
-            </tr>
-        {/each}
+    {#each matches as match}
+        <tr>
+            <td>{match.matchNo}</td>
+            <td>{match.home.name}</td>
+            <td>{match.away.name}</td>
+            <td>-</td>
+            <td>
+                <button onclick={() => goto(`/match/${match.matchNo}`)}>📝</button>
+            </td>
+        </tr>
+    {/each}
     </tbody>
 </table>

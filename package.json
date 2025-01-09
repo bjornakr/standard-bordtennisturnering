@@ -35,6 +35,8 @@
 		"vitest": "^2.0.4"
 	},
 	"dependencies": {
+		"@dicebear/collection": "^9.2.2",
+		"@dicebear/core": "^9.2.2",
 		"roundrobin": "^2.0.0"
 	}
 }

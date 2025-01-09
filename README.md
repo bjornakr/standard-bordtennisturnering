@@ -1,7 +1,7 @@
 # Standard bordtennisturnering
 
 * https://www.dicebear.com/how-to-use/js-library/
-
+* https://colorhunt.co/palette/16c47fffd65aff9d23f93827
 
 # sv
 
