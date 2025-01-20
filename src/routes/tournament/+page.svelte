@@ -40,9 +40,9 @@
             <td>{match.matchNo}</td>
             <td>{match.home.name}</td>
             <td>{match.away.name}</td>
-            <td>-</td>
+            <td>{match.score?.[0]}-{match.score?.[1]}</td>
             <td>
-                <button onclick={() => goto(`match/${match.matchNo}`)}>📝</button>
+                <button onclick={() => goto(`match/${match.matchNo}`)}>✎</button>
             </td>
         </tr>
     {/each}

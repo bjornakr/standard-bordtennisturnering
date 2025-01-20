@@ -28,3 +28,14 @@ export function loadMatch(matchNo: number): Match | undefined {
 export function deleteAllMatches(): void {
 	localStorage.removeItem(MATCHES_KEY);
 }
+
+export function setScore(matchNo: number, score: [number, number]): void {
+	const matches = loadMatches();
+	const match = matches.find((match) => match.matchNo === matchNo);
+	if (match) {
+		match.score = score;
+		console.log(match.score)
+		// save changes
+		saveMatches(matches);
+	}
+}

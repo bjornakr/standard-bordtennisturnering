@@ -1,8 +1,8 @@
-<script>
+<script lang="ts">
 	import { page } from '$app/state';
-	import { loadMatch } from '$lib/localStorageRepo';
+	import { loadMatch, setScore } from '$lib/localStorageRepo';
 	import { goto } from '$app/navigation';
-	import { base } from '$app/paths';
+	import { isValidFinalScore } from '$lib/domain';
 
 	const matchNo = Number(page.params.matchNo);
 	const match = loadMatch(matchNo);
@@ -10,8 +10,24 @@
 		throw new Error(`Match not found for matchNo: ${matchNo}`);
 	}
 
-	let homeScore = match.score?.[0] ?? 0;
-	let awayScore = match.score?.[1] ?? 0;
+	let homeScore = $state(match.score?.[0]);
+	let awayScore = $state(match.score?.[1]);
+
+	function getValidScore(): [number, number] | null {
+		if (isValidFinalScore(homeScore ?? 0, awayScore ?? 0))
+			return [homeScore ?? 0, awayScore ?? 0];
+		else
+			return null;
+	}
+
+	let isValidScore = $derived(isValidFinalScore(homeScore ?? 0, awayScore ?? 0))
+
+	function save() {
+		const score = getValidScore();
+		if (!score) return;
+		setScore(match.matchNo, score);
+		goto(`../${matchNo}`);
+	}
 </script>
 
 <h1>Kamp {matchNo}</h1>
@@ -20,20 +36,26 @@
 	<div class="player home">
 		<div class="name">{match.home.name}</div>
 		<div class="avatar">{@html match.home.avatar}</div>
-		<div class="score">{homeScore}</div>
+		<input class="score" type="number" placeholder="0" bind:value={homeScore}/>
 	</div>
 	<div class="vs">vs</div>
 	<div class="player away">
 		<div class="name">{match.away.name}</div>
 		<div class="avatar">{@html match.away.avatar}</div>
-		<div class="score">{awayScore}</div>
+		<input class="score" type="number" placeholder="0" bind:value={awayScore}/>
 	</div>
 </div>
 
+{#if isValidScore}
+	<p>Valid score</p>
+{:else}
+	<p>Invalid score</p>
+{/if}
+
+
 <div class="actions">
-	<button onclick={() => goto(`${matchNo}/play`)}>Spill kamp</button>
-	<button onclick={() => goto(`${matchNo}/score`)}>Sett resultat</button>
-	<button onclick={() => goto(`${base}/tournament`)}>Gå tilbake til turneringsoversikt</button>
+	<button onclick={() => goto(`../${matchNo}`)}>Avbryt</button>
+	<button disabled={!isValidScore} onclick={() => save()}>Lagre resultat</button>
 </div>
 
 <style>
@@ -76,6 +98,8 @@
     .score {
         font-size: 48px;
         font-weight: bold;
+        width: 3ch;
+        text-align: center;
     }
 
     .vs {
