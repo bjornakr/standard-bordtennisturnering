@@ -102,7 +102,7 @@
 
 <h2>Resultattavle</h2>
 
-<table>
+<table class="tiny">
     <thead>
     <tr>
         <th>#</th>
