@@ -14,11 +14,12 @@ input {
 
 table {
     border-spacing: 0px;
+    font-size: 0.8em;
 }
 th, td {
     text-align: left;
     border-bottom: 1px solid;
-    padding: 8px
+    padding: 4px
 }
 
 tr {
