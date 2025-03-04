@@ -3,22 +3,85 @@ import type { Match, Player } from './domain';
 const PLAYERS_KEY = 'players';
 const MATCHES_KEY = 'matches';
 
+type PlayerId = string;
+
+type PlayerDb = {
+	name: PlayerId,
+	avatarSvg: string,
+}
+
+function toPlayerDb(player: Player): PlayerDb {
+	return {
+		name: player.name,
+		avatarSvg: player.avatar,
+	};
+}
+
+function toPlayer(playerDb: PlayerDb): Player {
+	return {
+		name: playerDb.name,
+		avatar: playerDb.avatarSvg,
+	};
+}
+
+type MatchDb = {
+	matchNo: number;
+	home: PlayerId;
+	away: PlayerId;
+	score: [number, number] | null;
+}
+
+function toMatchDb(match: Match): MatchDb {
+	return {
+		matchNo: match.matchNo,
+		home: match.home.name,
+		away: match.away.name,
+		score: match.score,
+	};
+}
+
+function toMatch(matchDb: MatchDb, players: Player[]): Match | null {
+	const home = players.find(p => p.name === matchDb.home);
+	const away = players.find(p => p.name === matchDb.away);
+	if (!home || !away) {
+		return null;
+	}
+	return {
+		matchNo: matchDb.matchNo,
+		home: home,
+		away: away,
+		score: matchDb.score,
+	};
+}
+
 export function savePlayers(players: Player[]): void {
-	localStorage.setItem(PLAYERS_KEY, JSON.stringify(players));
+	const playersDb = players.map(toPlayerDb);
+	localStorage.setItem(PLAYERS_KEY, JSON.stringify(playersDb));
 }
 
 export function loadPlayers(): Player[] {
-	const stored = localStorage.getItem(PLAYERS_KEY);
-	return stored ? JSON.parse(stored) : [];
+	const playersDbRaw = localStorage.getItem(PLAYERS_KEY);
+	if (playersDbRaw === null) {
+		return [];
+	}
+	const playersDb = JSON.parse(playersDbRaw);
+	return playersDb.map(toPlayer);
 }
 
-export function saveMatches(players: Match[]): void {
-	localStorage.setItem(MATCHES_KEY, JSON.stringify(players));
+export function saveMatches(matches: Match[]): void {
+	const matchesDb = matches.map(toMatchDb);
+	localStorage.setItem(MATCHES_KEY, JSON.stringify(matchesDb));
 }
 
 export function loadMatches(): Match[] {
-	const stored = localStorage.getItem(MATCHES_KEY);
-	return stored ? JSON.parse(stored) : [];
+	const players = loadPlayers();
+	const matchesDbRaw = localStorage.getItem(MATCHES_KEY);
+
+	if (matchesDbRaw === null) {
+		return [];
+	}
+	const matchesDb = JSON.parse(matchesDbRaw)
+	return matchesDb.map((m: MatchDb) => toMatch(m, players))
 }
 
 export function loadMatch(matchNo: number): Match | undefined {
