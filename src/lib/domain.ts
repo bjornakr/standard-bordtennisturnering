@@ -84,7 +84,7 @@ export function isValidFinalScore(homeScore: number, awayScore: number): boolean
 }
 
 export function createNewRound(matches: Match[], playerCount: number): Match[] {
-	const startOffset = matches.length;
+	const startOffset = matches.length + 1;
 	const initialMatchCount = playerCount * (playerCount - 1) / 2;
 	const initialMatches = matches.slice(0,initialMatchCount);
 	const shouldFlipHomeAway = matches.length / initialMatchCount % 2 === 1;
