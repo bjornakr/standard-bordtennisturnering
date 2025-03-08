@@ -82,3 +82,17 @@ export function isValidFinalScore(homeScore: number, awayScore: number): boolean
 
 	return false;
 }
+
+export function createNewRound(matches: Match[], playerCount: number): Match[] {
+	const startOffset = matches.length;
+	const initialMatchCount = playerCount * (playerCount - 1) / 2;
+	const initialMatches = matches.slice(0,initialMatchCount);
+	const shouldFlipHomeAway = matches.length / initialMatchCount % 2 === 1;
+	console.log(initialMatches);
+	if (shouldFlipHomeAway) {
+		return initialMatches.map((match, idx) => createMatch(startOffset + idx, match.away, match.home));
+	}
+	else {
+		return initialMatches.map((match, idx) => createMatch(startOffset + idx, match.home, match.away));
+	}
+}

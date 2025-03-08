@@ -1,7 +1,7 @@
 <script lang="ts">
     import {loadMatches, loadPlayers, saveMatches} from '$lib/localStorageRepo';
     import {createMatches} from '$lib/utils';
-    import type {Player, Match} from '$lib/domain';
+    import { type Player, type Match, createNewRound } from '$lib/domain';
     import {goto} from "$app/navigation";
 
     const players: Player[] = loadPlayers();
@@ -17,7 +17,7 @@
         }
     }
 
-    const matches = getOrCreateMatches();
+    let matches = getOrCreateMatches();
 
     type Stats = { wins: number, losses: number, x: number, y: number }
     type LeaderboardEntry = { playerName: string, stats: Stats }
@@ -43,22 +43,22 @@
 
     function getStats(playerName: string): Stats {
         return matches.reduce((acc: Stats, match: Match) => {
-            let squeeze: [number, number] | null = null;
+            let scores: [number, number] | null = null;
             if (match.home.name === playerName && match.score !== null) 
-                    squeeze = match.score;
+                    scores = match.score;
             else if (match.away.name === playerName && match.score !== null) 
-                    squeeze = [match.score[1], match.score[0]];
+                    scores = [match.score[1], match.score[0]];
             else 
-                squeeze = null;
+                scores = null;
 
-            if (squeeze === null)
+            if (scores === null)
                 return acc;
             else 
                 return { 
-                    wins: squeeze[0] > squeeze[1] ? acc.wins + 1 : acc.wins,
-                    losses: squeeze[1] > squeeze[0] ? acc.losses + 1 : acc.losses,
-                    x: acc.x + squeeze[0],
-                    y: acc.y + squeeze[1],
+                    wins: scores[0] > scores[1] ? acc.wins + 1 : acc.wins,
+                    losses: scores[1] > scores[0] ? acc.losses + 1 : acc.losses,
+                    x: acc.x + scores[0],
+                    y: acc.y + scores[1],
                 }
             }, emptyStats)
     }
@@ -69,6 +69,12 @@
             stats: getStats(p.name)
             }));
         return entries.sort((a, b) => compareStats(a.stats, b.stats));
+    }
+
+    function createNewRoundz(): void {
+        const newMatches = createNewRound(matches, players.length);
+        matches = matches.concat(newMatches);
+        saveMatches(matches);
     }
 
 </script>
@@ -99,6 +105,8 @@
     {/each}
     </tbody>
 </table>
+
+<button onclick={() => createNewRoundz()}>Opprett ny runde</button>
 
 <h2>Resultattavle</h2>
 

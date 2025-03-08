@@ -6,20 +6,20 @@ const MATCHES_KEY = 'matches';
 type PlayerId = string;
 
 type PlayerDb = {
-	name: PlayerId,
+	id: PlayerId,
 	avatarSvg: string,
 }
 
 function toPlayerDb(player: Player): PlayerDb {
 	return {
-		name: player.name,
+		id: player.name,
 		avatarSvg: player.avatar,
 	};
 }
 
 function toPlayer(playerDb: PlayerDb): Player {
 	return {
-		name: playerDb.name,
+		name: playerDb.id,
 		avatar: playerDb.avatarSvg,
 	};
 }
@@ -40,11 +40,11 @@ function toMatchDb(match: Match): MatchDb {
 	};
 }
 
-function toMatch(matchDb: MatchDb, players: Player[]): Match | null {
+function toMatch(matchDb: MatchDb, players: Player[]): Match {
 	const home = players.find(p => p.name === matchDb.home);
 	const away = players.find(p => p.name === matchDb.away);
 	if (!home || !away) {
-		return null;
+		throw new Error(`player(s) not found for match: ${matchDb}`);
 	}
 	return {
 		matchNo: matchDb.matchNo,
@@ -88,6 +88,10 @@ export function loadMatch(matchNo: number): Match | undefined {
 	return loadMatches().find((match) => match.matchNo === matchNo);
 }
 
+export function getMatchesForPlayer(id: PlayerId): Match[] {
+	return loadMatches().filter((match) => match.home.name === id || match.away.name === id);
+}
+
 export function deleteAllMatches(): void {
 	localStorage.removeItem(MATCHES_KEY);
 }
@@ -97,8 +101,6 @@ export function setScore(matchNo: number, score: [number, number]): void {
 	const match = matches.find((match) => match.matchNo === matchNo);
 	if (match) {
 		match.score = score;
-		console.log(match.score)
-		// save changes
 		saveMatches(matches);
 	}
 }

@@ -6,31 +6,21 @@
 	import { HOME, AWAY } from '$lib/domain';
 	import * as Lib from '$lib/domain';
 
-	// import { base } from '$app/paths';
-
 	const matchNo = Number(page.params.matchNo);
 	const match = loadMatch(matchNo);
 	if (!match) {
 		throw new Error(`match not found for matchNo: ${matchNo}`);
 	}
 
-	type Serve = "serve";
-	const SERVE = "serve"
-	type Point = "point";
-	const POINT = "point"
+	type Serve = 'serve';
+	const SERVE = 'serve';
+	type Point = 'point';
+	const POINT = 'point';
 	type Event = [Serve, Side] | [Point, Side]
-	const events: [Event] = $state([]);
+	const events: Event[] = $state([]);
 
-	// type Serve = "home" | "away" | 'unassigned';
-	//
-	// let serve: Serve = $state('unassigned');
 	let homeScore = $derived(calcScore(HOME));
 	let awayScore = $derived(calcScore(AWAY));
-
-	// let homeServe = $derived(hasServe("home"));
-	// let awayServe = $derived(hasServe("away"));
-
-
 
 	function calcScore(side: Side) {
 		return events.filter(([t, s]) => t === POINT && s === side).length;
@@ -44,27 +34,6 @@
 		}
 	}
 
-	// function calcServingSide(): Side | "undecided" {
-	// 	const servesPerRound = 3;
-	// 	const totalScore = homeScore + awayScore;
-	// 	// const flips = Math.floor((events.length - serveEventCount) / servesPerRound);
-	// 	const flips = Math.floor(totalScore / servesPerRound);
-	//
-	// 	const serveEvent = (events.find(([t, _]) => t === SERVE));
-	// 	if (!serveEvent) {
-	// 		return "undecided"
-	// 	}
-	// 	const firstServeSide = serveEvent[1];
-	//
-	// 	if (homeScore >= (initScoreLimit - 1) && awayScore >= (initScoreLimit - 1)) {
-	// 		const flips = totalScore - 20;
-	// 		return flips % 2 === 0 ? firstServeSide : flipSide(firstServeSide);
-	// 	}
-	// 	else {
-	// 		return flips % 2 === 0 ? firstServeSide : flipSide(firstServeSide);
-	// 	}
-	// }
-
 	function hasServe(currentSide: Side): boolean {
 		const serveEvent = (events.find(([t, _]) => t === SERVE));
 		if (!serveEvent) {
@@ -73,24 +42,10 @@
 		return Lib.hasServe(homeScore, awayScore, serveEvent[1], currentSide);
 	}
 
-	// function calcWinner(): Side | "in-progress" {
-	// 	if (homeScore >= initScoreLimit && homeScore - awayScore >= 2) {
-	// 		return HOME;
-	// 	}
-	// 	else if (awayScore >= initScoreLimit && awayScore - homeScore >= 2) {
-	// 		return AWAY;
-	// 	}
-	// 	else {
-	// 		return 'in-progress'
-	// 	}
-	// }
-
 	function isWinner(side: Side): boolean {
-		return Lib.isWinner(homeScore, awayScore, side)
+		return Lib.isWinner(homeScore, awayScore, side);
 	}
-	// 	return calcWinner() === side;
-	// }
-	//
+
 	function isGameOver(): boolean {
 		return Lib.isGameOver(homeScore, awayScore);
 	}
@@ -99,10 +54,10 @@
 		if (isGameOver()) {
 			// do nothing
 		} else if (events.length === 0) {
-	    events.push([SERVE, side]);
-	  } else {
-	    events.push([POINT, side]);
-	  }
+			events.push([SERVE, side]);
+		} else {
+			events.push([POINT, side]);
+		}
 	}
 
 	function undo() {
@@ -128,14 +83,14 @@
 		{#if isWinner(HOME)}
 			<div class="serve">🏆</div>
 		{:else if isWinner(AWAY)}
-				<div class="serve"> </div>
+			<div class="serve"></div>
 		{:else if hasServe(HOME)}
 			<div class="serve">🏓</div>
 		{:else}
 			<div class="serve" style="filter: grayscale(100%); opacity: 0.4;">🏓</div>
 		{/if}
 		<div class="score">{homeScore}</div>
-		<button disabled={isGameOver()} onclick={() => scoreButtonClicked("home")}>{ scoreButtonText() }</button>
+		<button class="button-19" disabled={isGameOver()} onclick={() => scoreButtonClicked("home")}>{ scoreButtonText() }</button>
 	</div>
 	<div class="vs">vs</div>
 	<div class="player away">
@@ -144,14 +99,15 @@
 		{#if isWinner(AWAY)}
 			<div class="serve">🏆</div>
 		{:else if isWinner(HOME)}
-			<div class="serve"> </div>
+			<div class="serve"></div>
 		{:else if hasServe(AWAY)}
 			<div class="serve">🏓</div>
 		{:else}
 			<div class="serve" style="filter: grayscale(100%); opacity: 0.4;">🏓</div>
 		{/if}
 		<div class="score">{awayScore}</div>
-		<button disabled={isGameOver()} onclick={() => scoreButtonClicked("away")}>{ scoreButtonText() }</button>
+		<button class="button-19" disabled={isGameOver()}
+						onclick={() => scoreButtonClicked("away")}>{ scoreButtonText() }</button>
 
 	</div>
 </div>
@@ -174,6 +130,7 @@
         text-align: center;
         margin-bottom: 20px;
     }
+
     .match-container {
         display: flex;
         align-items: center;
@@ -219,6 +176,99 @@
     .actions {
         text-align: center;
         margin-top: 20px;
+    }
+
+    .custom-button {
+        display: inline-block;
+        padding: 12px 24px;
+        font-size: 16px;
+        font-weight: bold;
+        text-transform: uppercase;
+        color: #fff;
+        background: linear-gradient(135deg, #007aff, #0051a8);
+        border: none;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        cursor: pointer;
+        transition: all 0.3s ease-in-out;
+    }
+
+    .custom-button:hover {
+        background: linear-gradient(135deg, #0051a8, #007aff);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .custom-button:active {
+        transform: translateY(1px);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+
+    /* CSS */
+    .button-19 {
+        appearance: button;
+        background-color: #1899D6;
+        border: solid transparent;
+        border-radius: 16px;
+        border-width: 0 0 4px;
+        box-sizing: border-box;
+        color: #FFFFFF;
+        cursor: pointer;
+        display: inline-block;
+        font-family: din-round, sans-serif;
+        font-size: 15px;
+        font-weight: 700;
+        letter-spacing: .8px;
+        line-height: 20px;
+        margin: 0;
+        outline: none;
+        overflow: visible;
+        padding: 13px 16px;
+        text-align: center;
+        text-transform: uppercase;
+        touch-action: manipulation;
+        transform: translateZ(0);
+        transition: filter .2s;
+        user-select: none;
+        -webkit-user-select: none;
+        vertical-align: middle;
+        white-space: nowrap;
+        width: 100%;
+    }
+
+    .button-19:after {
+        background-clip: padding-box;
+        background-color: #1CB0F6;
+        border: solid transparent;
+        border-radius: 16px;
+        border-width: 0 0 4px;
+        bottom: -4px;
+        content: "";
+        left: 0;
+        position: absolute;
+        right: 0;
+        top: 0;
+        z-index: -1;
+    }
+
+    .button-19,
+    .button-19:focus {
+        user-select: auto;
+    }
+
+    .button-19:hover:not(:disabled) {
+        filter: brightness(1.1);
+        -webkit-filter: brightness(1.1);
+    }
+
+    .button-19:disabled {
+        cursor: auto;
+    }
+
+    .button-19:active {
+        border-width: 4px 0 0;
+        background: none;
     }
 
 </style>
